@@ -1,0 +1,155 @@
+{
+  "project_info": {
+    "project_number": "753843532005",
+    "firebase_url": "https://tan-dan-app-can-bo.firebaseio.com",
+    "project_id": "tan-dan-app-can-bo",
+    "storage_bucket": "tan-dan-app-can-bo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753843532005:android:f398b78cd67a8683a1a40c",
+        "android_client_info": {
+          "package_name": "com.tandan.appcore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "753843532005-k5klihjhs9stfr3qd7umt599s3g2h0fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxmSCX0dpLWftjBxkzh5CPKzu5GPRF6OU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753843532005-k5klihjhs9stfr3qd7umt599s3g2h0fm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "753843532005-40brh92ktko76jrsdg84u93nu29rp1ns.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tandan.iocubnd"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753843532005:android:3342833871d93794a1a40c",
+        "android_client_info": {
+          "package_name": "com.tandan.canbotd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "753843532005-k5klihjhs9stfr3qd7umt599s3g2h0fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxmSCX0dpLWftjBxkzh5CPKzu5GPRF6OU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753843532005-k5klihjhs9stfr3qd7umt599s3g2h0fm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "753843532005-40brh92ktko76jrsdg84u93nu29rp1ns.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tandan.iocubnd"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753843532005:android:f32bf7d0f42ca8aca1a40c",
+        "android_client_info": {
+          "package_name": "com.tandan.iocubnd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "753843532005-k5klihjhs9stfr3qd7umt599s3g2h0fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxmSCX0dpLWftjBxkzh5CPKzu5GPRF6OU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753843532005-k5klihjhs9stfr3qd7umt599s3g2h0fm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "753843532005-40brh92ktko76jrsdg84u93nu29rp1ns.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tandan.iocubnd"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753843532005:android:eb3148f217459050a1a40c",
+        "android_client_info": {
+          "package_name": "com.tandan.tdsmartgov"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "753843532005-k5klihjhs9stfr3qd7umt599s3g2h0fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxmSCX0dpLWftjBxkzh5CPKzu5GPRF6OU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753843532005-k5klihjhs9stfr3qd7umt599s3g2h0fm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "753843532005-40brh92ktko76jrsdg84u93nu29rp1ns.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tandan.iocubnd"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

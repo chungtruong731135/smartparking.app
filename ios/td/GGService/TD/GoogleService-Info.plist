@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>753843532005-b7lb1hcnus3cgt9dnepmqvb74iv3stih.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.753843532005-b7lb1hcnus3cgt9dnepmqvb74iv3stih</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCUPBfqmbaadBgxs3XVpRYInpQBr05KlYc</string>
+	<key>GCM_SENDER_ID</key>
+	<string>753843532005</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.tandan.appcore</string>
+	<key>PROJECT_ID</key>
+	<string>tan-dan-app-can-bo</string>
+	<key>STORAGE_BUCKET</key>
+	<string>tan-dan-app-can-bo.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:753843532005:ios:2dc0d3abb176d083a1a40c</string>
+	<key>DATABASE_URL</key>
+	<string>https://tan-dan-app-can-bo.firebaseio.com</string>
+</dict>
+</plist>
