@@ -137,9 +137,9 @@ def reactNativeArchitectures() {
 
 android {
 
-    packagingOptions {
-        pickFirst '**/libtesseract.so'
-    }
+    // packagingOptions {
+    //     pickFirst '**/libtesseract.so'
+    // }
 
     ndkVersion rootProject.ext.ndkVersion
 
@@ -280,7 +280,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     
-    implementation project(':react-native-tesseract-ocr')
+    // implementation project(':react-native-tesseract-ocr')
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules

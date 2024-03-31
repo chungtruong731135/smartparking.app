@@ -63,7 +63,7 @@ const MAIN_HomeScreen = () => {
   
   const Item = ({ plateImage, plateNumber, dateTimeEvent }) => (
     <View style={styles.item} onPress={() => handleItemPress(item)}>
-      <Image source={{ uri: "http://10.0.2.2:5000/" + plateImage }} style={styles.image} />
+      <Image source={{ uri: "http://192.168.0.103:5000/" + plateImage }} style={styles.image} />
       <View style={styles.separator}></View>
       <View style={styles.infoContainer}>
         <Text style={styles.plateNumber}>{plateNumber}</Text>
@@ -115,18 +115,19 @@ const MAIN_HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     padding: 20,
     textAlign: 'center',
+    color: '#000',
   },
   subHeader: {
     fontSize: 18,
     padding: 10,
     textAlign: 'center',
+    color: '#000',
   },
   item: {
     flexDirection: 'row',
@@ -156,15 +157,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5, 
+    color: '#000',
   },
   dateTime: {
     fontSize: 14,
+    color: '#000',
   },
   searchInput: {
     height: 40,
     margin: 12,
     borderWidth: 1,
     padding: 10,
+    color: '#000',
   },
 });
 
