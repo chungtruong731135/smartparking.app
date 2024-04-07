@@ -101,11 +101,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20, 
+    color: '#000'
   },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#ADD8E6',
   },
   inputContainer: {
     width: '80%',
