@@ -12,7 +12,7 @@ const TD_Header = (props) => {
   const { showBackButton = true, ...otherProps } = props;
   const [modalVisible, setModalVisible] = useState(false);
 
-  const { checkrightComponent, checkDisable, navigationRight, style } = props;
+  const { checkrightComponent, checkDisable, navigationRight, style, showLogoutButton } = props;
 
   const _renderleftComponent_stack = () => {
     if (!showBackButton) return null;
@@ -36,6 +36,18 @@ const TD_Header = (props) => {
     </TouchableOpacity>
   );
 
+  const _renderrightComponentLogout = () => {
+    return (
+      <TouchableOpacity onPress={props.onRightPress || (() => {})}>
+        {props.rightIcon ? (
+          <Icon name={props.rightIcon} color="white" size={20} style={{ marginHorizontal: 20 }} />
+        ) : (
+          <Icon name="sign-out-alt" color="white" size={20} style={{ marginHorizontal: 20 }} />
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <>
       {!checkDisable && (
@@ -50,7 +62,10 @@ const TD_Header = (props) => {
             zIndex: 1000
           }}
           leftComponent={<_renderleftComponent_stack />}
-          rightComponent={checkrightComponent ? <_renderrightComponent /> : <_renderrightComponentNo />}
+          rightComponent={
+            showLogoutButton ? <_renderrightComponentLogout /> : 
+            checkrightComponent ? <_renderrightComponent /> : <_renderrightComponentNo />
+          }
           centerComponent={{
             text: props.title,
             style: { color: '#fff', fontSize: 16, textTransform: 'uppercase', fontWeight: '500' },

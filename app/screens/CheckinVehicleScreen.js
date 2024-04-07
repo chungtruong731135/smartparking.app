@@ -8,8 +8,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import axios from 'axios';
 import moment from 'moment';
 import API from '../services/GlobalAPI';
-import ImagePicker from 'react-native-image-picker';
-
+import { ImagePicker, launchCamera } from 'react-native-image-picker';
 
 const CheckinVehicleScreen = ({ route }) => {
     const { branchDetails } = route.params;
@@ -99,6 +98,48 @@ const CheckinVehicleScreen = ({ route }) => {
             }
         });
     };
+
+    const openCamera = () => {
+      const options = {
+        saveToPhotos: true,
+        mediaType: 'photo',
+        includeBase64: false,
+        quality: 1,
+      };
+    
+      launchCamera(options, async response => {
+        console.log('Full response:', response);
+        if (response.assets && response.assets.length > 0) {
+          const selectedImageUri = response.assets[0].uri;
+          const selectedImageType = response.assets[0].type;
+          const typeParts = selectedImageType.split('/');
+          const imageExtension = typeParts[1];
+          const selectedImageName = response.assets[0].fileName;
+          console.log(selectedImageType);
+          
+          setImageSource(selectedImageUri);
+          setImageType(imageExtension);
+          setImageTypeOriginal(selectedImageType);
+          setImageName(selectedImageName);
+    
+          try {
+            const base64Image = await getBase64Image(selectedImageUri);
+            const licensePlateText = await analyzeImage(base64Image);
+            
+            setLicensePlate(licensePlateText);
+            setVehicleNumber(processLicensePlateText(licensePlateText));
+            
+            const imageData = await getImageData(selectedImageUri);
+            setPlateImageData(imageData);
+          } catch (error) {
+            console.error('Error in image capturing or analysis:', error);
+          }
+        } else {
+          console.error('No assets found or camera access denied');
+        }
+      });
+    };
+    
   
     const analyzeImage = async (base64Image) => {
       const GOOGLE_CLOUD_VISION_API_KEY = 'AIzaSyDFP3SjxdQnMfa0JDX8BMF2PlFUVqSe-N4'; // Your API key here
@@ -243,7 +284,7 @@ const CheckinVehicleScreen = ({ route }) => {
         isHome  
       />  
 
-      <TouchableOpacity style={styles.imageContainer} onPress={openImagePicker}>
+      <TouchableOpacity style={styles.imageContainer} onPress={openCamera}>
         {imageSource ? (
           <Image source={{ uri: imageSource }} style={styles.image} />
         ) : (
@@ -260,6 +301,7 @@ const CheckinVehicleScreen = ({ route }) => {
         <TextInput
           style={styles.input}
           placeholder="Nhập biển số xe"
+          placeholderTextColor= '#a3a3a3'
           value={vehicleNumber}
           onChangeText={(text) => setVehicleNumber(text)}
         />
@@ -270,6 +312,7 @@ const CheckinVehicleScreen = ({ route }) => {
         <TextInput
           style={styles.input}
           placeholder="Biển số xe được phát hiện"
+          placeholderTextColor= '#a3a3a3'
           value={vehicleNumber}
           onChangeText={(text) => setVehicleNumber(text)}
           // editable={false}
@@ -281,6 +324,7 @@ const CheckinVehicleScreen = ({ route }) => {
         <TextInput
           style={[styles.input, styles.boldText]}
           placeholder="Thời gian"
+          placeholderTextColor= '#a3a3a3'
           value={moment(dateTime).locale('vi').format('DD [tháng] MM [năm] YYYY, H:mm:ss')}
           onChangeText={(text) => setDateTime(text)}
           editable={false}
@@ -367,6 +411,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginVertical: 10,
     padding: 10,
+    color: 'green',
   },
 
   buttonContainer: {
@@ -413,6 +458,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     paddingLeft: 10,
     fontSize: 16,
+    color: '#000',
   },
   input: {
     flex: 1,
@@ -420,6 +466,7 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     padding: 10,
+    color: '#000'
   },
   picker: {
     borderWidth: 1,
