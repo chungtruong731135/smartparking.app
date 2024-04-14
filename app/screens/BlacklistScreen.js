@@ -82,6 +82,7 @@ const BlacklistScreen = ({ route }) => {
       <Icon
         name="delete"
         size={30}
+        color={'#000'}
         onPress={() => handleDelete(item.id)}
       />
     </View>
@@ -194,9 +195,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: '#000'
   },
   description: {
     fontSize: 14,
+    color: '#000'
   },
   headerText: {
     fontSize: 16,

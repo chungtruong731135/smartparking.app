@@ -1,14 +1,15 @@
 import axios from 'axios';
-import { NetworkInfo } from 'react-native-network-info';
+import Sever from '../config/Sever';
+
+const SERVER_URL = Sever.SERVER_URL;
 
 let apiInstance = null;
 
+export { SERVER_URL };
+
 export const initializeApiInstance = async () => {
-  // const ipv4Address = await NetworkInfo.getIPAddress();
-  // console.log(ipv4Address)
   apiInstance = axios.create({
-    // baseURL: `http://${ipv4Address}:5000/`,
-    baseURL: `http://192.168.2.231:5000/`,
+    baseURL: SERVER_URL,
     timeout: 30000,
   });
 };

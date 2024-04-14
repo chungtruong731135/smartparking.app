@@ -5,6 +5,8 @@ import { Colors } from '../theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import API from '../services/GlobalAPI';
+import { SERVER_URL } from '../services/GlobalAPI';
+
 import moment from 'moment';
 import { TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -62,7 +64,7 @@ const HistoryEventVehicleScreen = () => {
 
   const Item = ({ plateImage, plateNumber, dateTimeEvent }) => (
     <View style={styles.item} onPress={() => handleItemPress(item)}>
-      <Image source={{ uri: "http://10.0.2.2:5000/" + plateImage }} style={styles.image} />
+      <Image source={{ uri: SERVER_URL + "/" + plateImage }} style={styles.image} />
       <View style={styles.separator}></View>
       <View style={styles.infoContainer}>
         <Text style={styles.plateNumber}>{plateNumber}</Text>
@@ -120,6 +122,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     padding: 20,
     textAlign: 'center',
+    color: '#000'
+
   },
   subHeader: {
     fontSize: 18,
@@ -154,9 +158,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5, 
+    color: '#000'
   },
   dateTime: {
     fontSize: 14,
+    color: '#000'
   },
   searchInput: {
     height: 40,

@@ -5,8 +5,7 @@ import { TD_Header, TDTextInputNew } from '../components';
 import { Colors } from '../theme';
 import moment from 'moment';
 import API from '../services/GlobalAPI';
-
-const baseURL = "http://10.0.2.2:5000/"
+import { SERVER_URL } from '../services/GlobalAPI';
 
 const VehicleDetailScreen = () => {
   const route = useRoute();
@@ -16,7 +15,6 @@ const VehicleDetailScreen = () => {
   const [blacklistReason, setBlacklistReason] = useState('');
   const [showBlacklistInput, setShowBlacklistInput] = useState(false);
 
-  console.log("http://10.0.2.2:5000/" + vehicleDetails.plateImage)
   const fetchTicketInfo = async () => {
     try {
       const response = await API.requestGET_SP(`/api/v1/tickets/${vehicleDetails.ticketId}`);
@@ -89,7 +87,7 @@ const VehicleDetailScreen = () => {
       />  
         <View style={styles.imageContainer}>
             {vehicleDetails.plateImage
-            ? <Image source={{ uri: "http://10.0.2.2:5000/" + vehicleDetails.plateImage }} style={styles.image} />
+            ? <Image source={{ uri: SERVER_URL + `/` + vehicleDetails.plateImage }} style={styles.image} />
             : <Text>Không có ảnh</Text>
             }
         </View>
@@ -168,11 +166,13 @@ const styles = StyleSheet.create({
     borderRadius: 5, 
     width: '80%',
     alignSelf: 'center',
+    color: '#000'
   },
   info: {
     fontSize: 18, 
     marginVertical: 5, 
     textAlign: 'center', 
+    color : '#000'
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     padding: 10,
+    color: '#000'
   },
   exitButton: {
     backgroundColor: 'red',
