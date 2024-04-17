@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 18,
+    color: '#fff'
   },
 });
 

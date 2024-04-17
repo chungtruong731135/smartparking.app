@@ -60,77 +60,99 @@ const CheckinVehicleScreen = ({ route }) => {
       fetchTickets();
     }, []);
 
-    const openImagePicker = () => {
-      const options = {
-          noData: true,
-      };
+    // const openImagePicker = () => {
+    //   const options = {
+    //       noData: true,
+    //   };
   
-        launchImageLibrary(options, async response => {
-          console.log(response.assets);
-            if (response.assets && response.assets.length > 0) {
-                const selectedImageUri = response.assets[0].uri;
+    //     launchImageLibrary(options, async response => {
+    //       console.log(response.assets);
+    //         if (response.assets && response.assets.length > 0) {
+    //             const selectedImageUri = response.assets[0].uri;
 
-                const selectedImageType = response.assets[0].type;
-                const typeParts = selectedImageType.split('/');
-                const imageExtension = typeParts[1];
+    //             const selectedImageType = response.assets[0].type;
+    //             const typeParts = selectedImageType.split('/');
+    //             const imageExtension = typeParts[1];
 
-                const selectedImageName = response.assets[0].fileName;
-                console.log(selectedImageType)
+    //             const selectedImageName = response.assets[0].fileName;
+    //             console.log(selectedImageType)
                 
-                setImageSource(selectedImageUri);
-                setImageType(imageExtension);
-                setImageTypeOriginal(selectedImageType) //kieu dang image/jpex ex.
-                setImageName(selectedImageName);
+    //             setImageSource(selectedImageUri);
+    //             setImageType(imageExtension);
+    //             setImageTypeOriginal(selectedImageType) //kieu dang image/jpex ex.
+    //             setImageName(selectedImageName);
 
-                try {
-                    const base64Image = await getBase64Image(selectedImageUri);
-                    const licensePlateText = await analyzeImage(base64Image);
+    //             try {
+    //                 const base64Image = await getBase64Image(selectedImageUri);
+    //                 const licensePlateText = await analyzeImage(base64Image);
 
-                    setLicensePlate(licensePlateText);
-                    setVehicleNumber(processLicensePlateText(licensePlateText));
+    //                 setLicensePlate(licensePlateText);
+    //                 setVehicleNumber(processLicensePlateText(licensePlateText));
 
-                    const imageData = await getImageData(selectedImageUri);
-                    setPlateImageData(imageData);
+    //                 const imageData = await getImageData(selectedImageUri);
+    //                 setPlateImageData(imageData);
 
-                } catch (error) {
-                    console.error('Error in image picking or analysis:', error);
-                }
-            }
+    //             } catch (error) {
+    //                 console.error('Error in image picking or analysis:', error);
+    //             }
+    //         }
+    //     });
+    // };
+    const uploadImageToServer = async (base64Image) => {
+      try {
+        const formData = new FormData();
+        formData.append('file', {
+          uri: base64Image,
+          type: 'image/jpeg',
+          name: 'image.jpg',
         });
+    
+        const response = await axios.post(
+          'http://tdparking-api.hanhchinhcong.org/LicencePlate/UploadingSingleFile',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+    
+        // Xử lý dữ liệu trả về từ API nếu cần
+        console.log('Response from server:', response);
+        
+        // Trả về kết quả xử lý từ API nếu cần
+        return response.data;
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        throw error; // Re-throw the error for higher-level handling if needed
+      }
     };
 
     const openCamera = () => {
       const options = {
         saveToPhotos: true,
         mediaType: 'photo',
-        includeBase64: false,
+        includeBase64: true, // Sử dụng base64 để lấy ảnh từ camera
         quality: 1,
       };
     
       launchCamera(options, async response => {
         console.log('Full response:', response);
         if (response.assets && response.assets.length > 0) {
+          const selectedImageBase64 = response.assets[0].base64; // Lấy base64 của ảnh từ response
           const selectedImageUri = response.assets[0].uri;
           const selectedImageType = response.assets[0].type;
-          const typeParts = selectedImageType.split('/');
-          const imageExtension = typeParts[1];
-          const selectedImageName = response.assets[0].fileName;
-          console.log(selectedImageType);
-          
+    
           setImageSource(selectedImageUri);
-          setImageType(imageExtension);
-          setImageTypeOriginal(selectedImageType);
-          setImageName(selectedImageName);
+          setImageType(selectedImageType);
     
           try {
-            const base64Image = await getBase64Image(selectedImageUri);
-            const licensePlateText = await analyzeImage(base64Image);
-            
+            const licensePlateText = await uploadImageToServer(selectedImageBase64);
+    
             setLicensePlate(licensePlateText);
             setVehicleNumber(processLicensePlateText(licensePlateText));
-            
-            const imageData = await getImageData(selectedImageUri);
-            setPlateImageData(imageData);
+    
+            // Nếu cần xử lý thêm dữ liệu trả về từ API
           } catch (error) {
             console.error('Error in image capturing or analysis:', error);
           }
@@ -141,37 +163,29 @@ const CheckinVehicleScreen = ({ route }) => {
     };
     
   
-    const analyzeImage = async (base64Image) => {
-      const GOOGLE_CLOUD_VISION_API_KEY = 'AIzaSyDFP3SjxdQnMfa0JDX8BMF2PlFUVqSe-N4'; // Your API key here
-      const GOOGLE_CLOUD_VISION_API_URL = 'https://vision.googleapis.com/v1/images:annotate';
-  
-      const requestBody = {
-          requests: [
-              {
-                  image: {
-                      content: base64Image,
-                  },
-                  features: [
-                      {
-                          type: 'TEXT_DETECTION',
-                      },
-                  ],
-                  imageContext: {
-                      languageHints: ['vi'],
-                  },
-              },
-          ],
-      };
+    const analyzeImage = async (imageUri) => {
+      const formData = new FormData();
+      formData.append('image', {
+          uri: imageUri,
+          type: 'image/jpeg',
+          name: 'plate_image.jpg',
+      });
   
       try {
-          const response = await axios.post(`${GOOGLE_CLOUD_VISION_API_URL}?key=${GOOGLE_CLOUD_VISION_API_KEY}`, requestBody);
-          const plateText = processLicensePlateText(response.data.responses[0]?.fullTextAnnotation?.text || 'Không tìm thấy biển số');
-          console.log(plateText)
+          const response = await axios.post('http://tdparking-api.hanhchinhcong.org/docs/LicencePlate/UploadingSingleFile', formData, {
+              headers: {
+                  'Content-Type': 'multipart/form-data',
+              },
+          });
+  
+          // Xử lý phản hồi từ API và trích xuất thông tin cần thiết
+          const plateText = response.data.plateNumber;
+          console.log(plateText);
           setLicensePlateText(plateText);
           return plateText;
       } catch (error) {
           console.error('Error analyzing image:', error.response ? error.response.data : error.message);
-          throw error; // Re-throw the error for higher-level handling if needed
+          throw error; // Ném lỗi để xử lý ở cấp cao hơn nếu cần
       }
   };
   
