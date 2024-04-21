@@ -60,52 +60,16 @@ const CheckinVehicleScreen = ({ route }) => {
       fetchTickets();
     }, []);
 
-    // const openImagePicker = () => {
-    //   const options = {
-    //       noData: true,
-    //   };
-  
-    //     launchImageLibrary(options, async response => {
-    //       console.log(response.assets);
-    //         if (response.assets && response.assets.length > 0) {
-    //             const selectedImageUri = response.assets[0].uri;
-
-    //             const selectedImageType = response.assets[0].type;
-    //             const typeParts = selectedImageType.split('/');
-    //             const imageExtension = typeParts[1];
-
-    //             const selectedImageName = response.assets[0].fileName;
-    //             console.log(selectedImageType)
-                
-    //             setImageSource(selectedImageUri);
-    //             setImageType(imageExtension);
-    //             setImageTypeOriginal(selectedImageType) //kieu dang image/jpex ex.
-    //             setImageName(selectedImageName);
-
-    //             try {
-    //                 const base64Image = await getBase64Image(selectedImageUri);
-    //                 const licensePlateText = await analyzeImage(base64Image);
-
-    //                 setLicensePlate(licensePlateText);
-    //                 setVehicleNumber(processLicensePlateText(licensePlateText));
-
-    //                 const imageData = await getImageData(selectedImageUri);
-    //                 setPlateImageData(imageData);
-
-    //             } catch (error) {
-    //                 console.error('Error in image picking or analysis:', error);
-    //             }
-    //         }
-    //     });
-    // };
-    const uploadImageToServer = async (base64Image) => {
+    const uploadImageToServer = async (imageUri) => {
       try {
         const formData = new FormData();
         formData.append('file', {
-          uri: base64Image,
-          type: 'image/jpeg',
-          name: 'image.jpg',
+          uri: imageUri,
+          type: 'image/jpeg', // Đảm bảo rằng type tương ứng với định dạng hình ảnh bạn đang gửi đi
+          name: 'image.jpg', // Tên tệp hình ảnh
         });
+    
+        console.log('Uploading image with data:', formData);
     
         const response = await axios.post(
           'http://tdparking-api.hanhchinhcong.org/LicencePlate/UploadingSingleFile',
@@ -117,13 +81,12 @@ const CheckinVehicleScreen = ({ route }) => {
           }
         );
     
-        // Xử lý dữ liệu trả về từ API nếu cần
         console.log('Response from server:', response);
-        
-        // Trả về kết quả xử lý từ API nếu cần
+    
         return response.data;
       } catch (error) {
         console.error('Error uploading image:', error);
+        console.error('Error details:', error.response ? error.response.data : error.message); // Log chi tiết lỗi
         throw error; // Re-throw the error for higher-level handling if needed
       }
     };
@@ -132,93 +95,32 @@ const CheckinVehicleScreen = ({ route }) => {
       const options = {
         saveToPhotos: true,
         mediaType: 'photo',
-        includeBase64: true, // Sử dụng base64 để lấy ảnh từ camera
+        includeBase64: false,
         quality: 1,
       };
     
       launchCamera(options, async response => {
-        console.log('Full response:', response);
-        if (response.assets && response.assets.length > 0) {
-          const selectedImageBase64 = response.assets[0].base64; // Lấy base64 của ảnh từ response
-          const selectedImageUri = response.assets[0].uri;
-          const selectedImageType = response.assets[0].type;
+        if (response?.assets && response?.assets.length > 0) {
+          const selectedImageUri = response?.assets[0]?.uri;
+          const selectedImageType = response?.assets[0]?.type;
     
           setImageSource(selectedImageUri);
           setImageType(selectedImageType);
     
           try {
-            const licensePlateText = await uploadImageToServer(selectedImageBase64);
+            const licensePlateResponse = await uploadImageToServer(selectedImageUri);
     
-            setLicensePlate(licensePlateText);
-            setVehicleNumber(processLicensePlateText(licensePlateText));
+            const textPlate = licensePlateResponse?.data[0]?.textPlate;
+
+            setLicensePlate(licensePlateResponse);
+            setVehicleNumber(textPlate);
     
-            // Nếu cần xử lý thêm dữ liệu trả về từ API
-          } catch (error) {
-            console.error('Error in image capturing or analysis:', error);
-          }
+          } catch (error) {}
         } else {
           console.error('No assets found or camera access denied');
         }
-      });
-    };
-    
-  
-    const analyzeImage = async (imageUri) => {
-      const formData = new FormData();
-      formData.append('image', {
-          uri: imageUri,
-          type: 'image/jpeg',
-          name: 'plate_image.jpg',
-      });
-  
-      try {
-          const response = await axios.post('http://tdparking-api.hanhchinhcong.org/docs/LicencePlate/UploadingSingleFile', formData, {
-              headers: {
-                  'Content-Type': 'multipart/form-data',
-              },
-          });
-  
-          // Xử lý phản hồi từ API và trích xuất thông tin cần thiết
-          const plateText = response.data.plateNumber;
-          console.log(plateText);
-          setLicensePlateText(plateText);
-          return plateText;
-      } catch (error) {
-          console.error('Error analyzing image:', error.response ? error.response.data : error.message);
-          throw error; // Ném lỗi để xử lý ở cấp cao hơn nếu cần
-      }
-  };
-  
-    const processLicensePlateText = (text) => {
-      return text.replace(/\n/g, ' ');
-    };
-  
-    const getBase64Image = async (imageUri) => {
-        const response = await fetch(imageUri);
-        const blob = await response.blob();
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onloadend = () => {
-            const base64data = reader.result.split(',')[1];
-            resolve(base64data);
-          };
-          reader.onerror = (error) => reject(error);
-        });
-    };
-
-    const getImageData = async (imageUri) => {
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-    
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-          const base64data = reader.result.split(',')[1];
-          resolve(base64data);
-        };
-        reader.onerror = (error) => reject(error);
+      }, error => {
+        console.error('Error while opening camera:', error);
       });
     };
 
@@ -268,7 +170,7 @@ const CheckinVehicleScreen = ({ route }) => {
     
           console.log(response)
 
-          if (response) {
+          if (response.status == 200) {
             console.log('Request thành công:', response.data);
             alert('Xe vào thành công!');
             navigation.goBack();
