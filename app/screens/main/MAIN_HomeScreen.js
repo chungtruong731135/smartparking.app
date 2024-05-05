@@ -4,7 +4,7 @@ import { TD_Header, TDTextInputNew, FooterMenu } from '../../components';
 import { Colors } from '../../theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import API from '../../services/GlobalAPI';
+import API, { SERVER_URL } from '../../services/GlobalAPI';
 import moment from 'moment';
 import { TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -20,7 +20,7 @@ const MAIN_HomeScreen = () => {
     try {
       const response = await API.requestPOST_SP('/api/v1/eventvehicles/search-event-vehicles', {
         pageNumber: 1,
-        pageSize: 10,
+        pageSize: 1000,
         branchId: branchDetails.id,
         laneDirection: 'IN',
         plateNumber: ''
@@ -37,7 +37,7 @@ const MAIN_HomeScreen = () => {
     try {
       const response = await API.requestPOST_SP('/api/v1/eventvehicles/search-event-vehicles', {
         pageNumber: 1,
-        pageSize: 10,
+        pageSize: 1000,
         branchId: branchDetails.id,
         laneDirection: 'IN',
         plateNumber: plateNumber
@@ -63,7 +63,7 @@ const MAIN_HomeScreen = () => {
   
   const Item = ({ plateImage, plateNumber, dateTimeEvent }) => (
     <View style={styles.item} onPress={() => handleItemPress(item)}>
-      <Image source={{ uri: "http://192.168.0.103:5000/" + plateImage }} style={styles.image} />
+      <Image source={{ uri: SERVER_URL + "/" + plateImage }} style={styles.image} />
       <View style={styles.separator}></View>
       <View style={styles.infoContainer}>
         <Text style={styles.plateNumber}>{plateNumber}</Text>

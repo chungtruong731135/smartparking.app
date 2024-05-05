@@ -20,15 +20,12 @@ const CheckinVehicleScreen = ({ route }) => {
     const [imageName, setImageName] = useState(null);
 
     const [licensePlate, setLicensePlate] = useState('');
-    const [licensePlateText, setLicensePlateText] = useState('');
     const [vehicleNumber, setVehicleNumber] = useState('');
+    const [detectedPlateNumber, setDetectedPlateNumber] = useState('');
     const [selectedTicket, setSelectedTicket] = useState('');
     const [dateTime, setDateTime] = useState(moment().toISOString());
     const [ticketList, setTicketList] = useState([]);
     const [plateImageData, setPlateImageData] = useState('');
-
-    // console.log(imageSource)
-    // console.log(selectedTicket)
 
     useEffect(() => {
       const timer = setInterval(() => {
@@ -65,8 +62,8 @@ const CheckinVehicleScreen = ({ route }) => {
         const formData = new FormData();
         formData.append('file', {
           uri: imageUri,
-          type: 'image/jpeg', // Đảm bảo rằng type tương ứng với định dạng hình ảnh bạn đang gửi đi
-          name: 'image.jpg', // Tên tệp hình ảnh
+          type: 'image/jpeg',
+          name: 'image.jpg',
         });
     
         console.log('Uploading image with data:', formData);
@@ -80,14 +77,12 @@ const CheckinVehicleScreen = ({ route }) => {
             },
           }
         );
-    
-        console.log('Response from server:', response);
-    
+        
         return response.data;
       } catch (error) {
         console.error('Error uploading image:', error);
-        console.error('Error details:', error.response ? error.response.data : error.message); // Log chi tiết lỗi
-        throw error; // Re-throw the error for higher-level handling if needed
+        console.error('Error details:', error.response ? error.response.data : error.message);
+        throw error;
       }
     };
 
@@ -95,26 +90,37 @@ const CheckinVehicleScreen = ({ route }) => {
       const options = {
         saveToPhotos: true,
         mediaType: 'photo',
-        includeBase64: false,
-        quality: 1,
+        includeBase64: true,
+        quality: 1, // Giảm chất lượng để giảm dung lượng file
+        maxWidth: 800, // Giới hạn chiều rộng tối đa của hình ảnh
+        maxHeight: 600, // Giới hạn chiều cao tối đa của hình ảnh
       };
     
       launchCamera(options, async response => {
         if (response?.assets && response?.assets.length > 0) {
           const selectedImageUri = response?.assets[0]?.uri;
           const selectedImageType = response?.assets[0]?.type;
-    
+          const currentTime = moment().format('YYYYMMDDHHmmss');
+          const randomValue = Math.floor(Math.random() * 1000);
+          const imageFileName = `plate_${currentTime}_${randomValue}`; // Tạo tên file ảnh
+
           setImageSource(selectedImageUri);
           setImageType(selectedImageType);
-    
+          setImageName(imageFileName);
+
           try {
+            const base64Data = response.assets[0]?.base64;
+            
+            setPlateImageData(base64Data);
+
             const licensePlateResponse = await uploadImageToServer(selectedImageUri);
     
             const textPlate = licensePlateResponse?.data[0]?.textPlate;
 
             setLicensePlate(licensePlateResponse);
             setVehicleNumber(textPlate);
-    
+            setDetectedPlateNumber(textPlate);
+
           } catch (error) {}
         } else {
           console.error('No assets found or camera access denied');
@@ -130,10 +136,11 @@ const CheckinVehicleScreen = ({ route }) => {
           const plateNumber = vehicleNumber; 
           const detectedPlateNumber = vehicleNumber; 
           const dateTimeEvent = moment(dateTime).toISOString(); 
+          const imageExtension = imageType.split('/')[1];
           const plateImage = {
             name: imageName,
-            extension: `.${imageType}`,
-            data: `data:${imageTypeOriginal};base64,${plateImageData}`, 
+            extension: `.${imageExtension}`,
+            data: `data:${imageType};base64,${plateImageData}`, 
           };
           const vehicleImage = 'string'; 
           const hardwareSyncId = 'string'; 
@@ -142,18 +149,6 @@ const CheckinVehicleScreen = ({ route }) => {
           const branchId = branchDetails.id;
           const ticketId = selectedTicket; 
     
-          console.log('Request body:', {
-            plateNumber,
-            detectedPlateNumber,
-            dateTimeEvent,
-            plateImage,
-            vehicleImage,
-            hardwareSyncId,
-            description,
-            status,
-            branchId,
-            ticketId,
-        });
           // Gọi API
           const response = await API.requestPOST_SP('/api/v1/eventvehicles/enter', {
             plateNumber,
@@ -168,9 +163,7 @@ const CheckinVehicleScreen = ({ route }) => {
             ticketId,
           });
     
-          console.log(response)
-
-          if (response.status == 200) {
+          if (response) {
             console.log('Request thành công:', response.data);
             alert('Xe vào thành công!');
             navigation.goBack();
@@ -178,7 +171,6 @@ const CheckinVehicleScreen = ({ route }) => {
             console.error('Request không thành công:', response);
           }
     
-          // navigation.goBack();
         } else {
           console.error('Không có ảnh được chọn.');
         }
@@ -229,9 +221,9 @@ const CheckinVehicleScreen = ({ route }) => {
           style={styles.input}
           placeholder="Biển số xe được phát hiện"
           placeholderTextColor= '#a3a3a3'
-          value={vehicleNumber}
-          onChangeText={(text) => setVehicleNumber(text)}
-          // editable={false}
+          value={detectedPlateNumber}
+          // onChangeText={(text) => setVehicleNumber(text)}
+          editable={false}
         />
       </View>
 
