@@ -1,5 +1,5 @@
 import React, { useState , useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Button, Modal, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { TD_Header } from '../components';
@@ -9,6 +9,8 @@ import axios from 'axios';
 import moment from 'moment';
 import API from '../services/GlobalAPI';
 import { ImagePicker, launchCamera } from 'react-native-image-picker';
+import NfcManager, {NfcTech, Ndef} from 'react-native-nfc-manager';
+import { TextDecoder } from 'text-encoding';
 
 const CheckinVehicleScreen = ({ route }) => {
     const { branchDetails } = route.params;
@@ -26,6 +28,8 @@ const CheckinVehicleScreen = ({ route }) => {
     const [dateTime, setDateTime] = useState(moment().toISOString());
     const [ticketList, setTicketList] = useState([]);
     const [plateImageData, setPlateImageData] = useState('');
+
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
       const timer = setInterval(() => {
@@ -102,7 +106,7 @@ const CheckinVehicleScreen = ({ route }) => {
           const selectedImageType = response?.assets[0]?.type;
           const currentTime = moment().format('YYYYMMDDHHmmss');
           const randomValue = Math.floor(Math.random() * 1000);
-          const imageFileName = `plate_${currentTime}_${randomValue}`; // Tạo tên file ảnh
+          const imageFileName = `plate_${currentTime}_${randomValue}`;
 
           setImageSource(selectedImageUri);
           setImageType(selectedImageType);
@@ -178,8 +182,40 @@ const CheckinVehicleScreen = ({ route }) => {
         console.error('Error entering vehicle:', error);
       }
     };
-    
 
+    const readNfc = async () => {
+      setModalVisible(true);
+      try {
+          await NfcManager.requestTechnology(NfcTech.Ndef);
+          const tag = await NfcManager.getTag();
+          console.log('NFC Tag Detected:', tag);
+  
+          if (tag.ndefMessage) {
+              let ndefRecords = tag.ndefMessage;
+              console.log(ndefRecords);
+  
+              for (const record of ndefRecords) {
+                  const textDecoder = new TextDecoder('utf-8');
+                  const text = textDecoder.decode(new Uint8Array(record.payload));
+  
+                  console.log(text ? text : null);
+  
+                  if (text.includes('Id:')) {
+                      const ticketIdFromTag = text.match(/Id:\s*(.+)\n/)[1];
+                      alert('Ticket ID from NFC Tag:', ticketIdFromTag);
+                      setSelectedTicket(ticketIdFromTag);
+                  }
+              }
+          }
+      } catch (error) {
+          console.error('Failed to read NFC tag:', error);
+          alert('Không thể đọc thẻ NFC!');
+      } finally {
+          NfcManager.cancelTechnologyRequest();
+          setModalVisible(false);
+      }
+  };
+  
   return (
     <View style={styles.container}>
       <TD_Header
@@ -241,21 +277,10 @@ const CheckinVehicleScreen = ({ route }) => {
 
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>Vé xe:</Text>
-        <View style={styles.picker}>
-          <Picker
-            selectedValue={selectedTicket}
-            style={styles.input}
-            itemStyle={{ justifyContent: 'flex-start' }}
-            onValueChange={(itemValue, itemIndex) => setSelectedTicket(itemValue)}
-          >
-            {ticketList.map((ticket) => (
-              <Picker.Item key={ticket.id} label={ticket.name} value={ticket.id} />
-            ))}
-        </Picker>
-        </View>
-        
+        <TouchableOpacity style={styles.button} onPress={readNfc}>
+          <Text style={styles.buttonText}>Quẹt Thẻ</Text>
+        </TouchableOpacity>
       </View>
-
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()} >
@@ -265,6 +290,31 @@ const CheckinVehicleScreen = ({ route }) => {
             <Text style={styles.blackListButtonText}>Xe vào</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+            setModalVisible(!modalVisible);
+        }}
+        >
+        <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.modalText}>Vui lòng đưa thẻ đến gần thiết bị Android của bạn.</Text>
+            <TouchableOpacity
+                style={styles.cancelButtonModal}
+                onPress={() => {
+                setModalVisible(false);
+                NfcManager.cancelTechnologyRequest(); // Ngưng yêu cầu NFC nếu người dùng hủy
+                }}
+            >
+                <Text style={styles.cancelButtonText}>Hủy</Text>
+            </TouchableOpacity>
+            </View>
+        </View>
+        </Modal>
     </View>
   );
 };
@@ -382,6 +432,46 @@ const styles = StyleSheet.create({
     width: '70%',
     marginTop: 20,
   },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+  margin: 20,
+  backgroundColor: 'white',
+  borderRadius: 20,
+  padding: 35,
+  alignItems: 'center',
+  shadowColor: '#000',
+  shadowOffset: {
+      width: 0,
+      height: 2
+  },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  elevation: 5
+  },
+  modalText: {
+  marginBottom: 15,
+  textAlign: 'center',
+  fontSize: 16,
+  color: '#000'
+  },
+  cancelButtonModal: {
+  backgroundColor: 'red', // Màu nền cho nút hủy
+  borderRadius: 20, // Bo tròn góc
+  padding: 10, // Đệm xung quanh nội dung trong nút
+  elevation: 2, // Độ nổi của nút, tạo hiệu ứng bóng
+  marginTop: 10, // Khoảng cách từ nội dung trên
+  },
+  cancelButtonText: {
+  color: 'white', // Màu chữ
+  fontWeight: 'bold', // Độ đậm của chữ
+  textAlign: 'center', // Căn giữa chữ trong nút
+  }
 });
 
 export default CheckinVehicleScreen;

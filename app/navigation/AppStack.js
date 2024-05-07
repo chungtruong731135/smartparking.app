@@ -11,7 +11,8 @@ import VehicleDetailScreen from '../screens/VehicleDetailScreen'
 import HistoryEventVehicleScreen from '../screens/HistoryEventVehicleScreen'
 import BlacklistScreen from '../screens/BlacklistScreen';
 import CheckinVehicleScreen from '../screens/CheckinVehicleScreen';
-import UserProfileScreen from '../screens/UserProfileScreen';
+import { UserProfileScreen, MainManagementScreen, TicketsManagementScreen } from '../screens/management';
+import TicketDetailsScreen from '../screens/management/ticket/TicketDetailsScreen';
 import RevenueStatisticsScreen from '../screens/RevenueStatisticsScreen';
 
 const Stack = createNativeStackNavigator();
@@ -32,7 +33,10 @@ const App_ = () => {
             <Stack.Screen name="HistoryEventVehicleScreen" component={HistoryEventVehicleScreen} />
             <Stack.Screen name="BlacklistScreen" component={BlacklistScreen} />
             <Stack.Screen name="CheckinVehicleScreen" component={CheckinVehicleScreen} />
-            <Stack.Screen name="UserProfileScreen" component={UserProfileScreen} />
+            <Stack.Screen name="MainManagementScreen" component={MainManagementScreen} />
+                <Stack.Screen name="UserProfileScreen" component={UserProfileScreen} />
+                <Stack.Screen name="TicketsManagementScreen" component={TicketsManagementScreen} />
+                <Stack.Screen name="TicketDetailsScreen" component={TicketDetailsScreen} />
             <Stack.Screen name="RevenueStatisticsScreen" component={RevenueStatisticsScreen} />
 
         </Stack.Navigator>

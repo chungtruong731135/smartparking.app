@@ -1,17 +1,22 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { TD_Header, TDTextInputNew } from '../components';
-import { Colors } from '../theme';
+import { TD_Header, TDTextInputNew } from '../../components';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { Colors } from '../../theme';
 
-const UserProfileScreen = ({ navigation }) => {
+const MainScreen = () => {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { branchDetails } = route.params;
+
   const handleNavigate = (screenName) => {
     navigation.navigate(screenName);
   };
-
+  
   return (
     <View style={styles.container}>
       <TD_Header
-        title="Thông tin người quản lý"
+        title="Quản lý"
         showBackButton={true}
         backgroundColor={Colors.primary}
         textColor={'#fff'}
@@ -20,20 +25,12 @@ const UserProfileScreen = ({ navigation }) => {
         isHome  
       />
       <View style={styles.menu}>
-        <TouchableOpacity style={styles.menuItem} >
-          <Text style={styles.menuText}>Thông tin</Text>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('UserProfileScreen', { branchDetails })}>
+          <Text style={styles.menuText}>Thông tin người quản lý</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem} >
-          <Text style={styles.menuText}>Đổi mật khẩu</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuItem} >
-          <Text style={styles.menuText}>Ngôn ngữ</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuItem} >
-          <Text style={styles.menuText}>Đăng xuất</Text>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('TicketsManagementScreen' , { branchDetails })}>
+          <Text style={styles.menuText}>Quản lý thẻ</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -65,8 +62,8 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 18,
-    color: '#fff'
+    color: '#000'
   },
 });
 
-export default UserProfileScreen;
+export default MainScreen;

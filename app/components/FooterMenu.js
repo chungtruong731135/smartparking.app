@@ -34,15 +34,15 @@ const FooterMenu = ({ navigation, branchDetails }) => {
 
       <TouchableOpacity
         style={[styles.menuItem]}
-        onPress={() => navigation.navigate('RevenueStatisticsScreen')}
+        onPress={() => navigation.navigate('RevenueStatisticsScreen', { branchDetails })}
         >
         <Icon name="line-chart" size={20} color="#ffffff" />
         <Text style={styles.menuText}>Doanh thu</Text>
     </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('UserProfileScreen')}>
+      <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('MainManagementScreen', { branchDetails })}>
         <Icon name="user" size={20} color="#ffffff" />
-        <Text style={styles.menuText}>Profile</Text>
+        <Text style={styles.menuText}>Quản lý</Text>
       </TouchableOpacity>
     </View>
   );

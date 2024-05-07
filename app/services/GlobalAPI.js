@@ -53,7 +53,24 @@ const API = {
         return { data: null };
       });
   },
-  
+
+  requestPUT_SP: async (urlService, data) => {
+    if (!apiInstance) await initializeApiInstance();
+    return await apiInstance
+      .put(urlService, JSON.stringify(data), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(function (response) {
+        return response.data;
+      })
+      .catch(function (error) {
+        console.log(error);
+        return { data: null };
+      });
+  },
+
   requestPOST_Login: async (urlService, data) => {
     if (!apiInstance) await initializeApiInstance();
     return await apiInstance
