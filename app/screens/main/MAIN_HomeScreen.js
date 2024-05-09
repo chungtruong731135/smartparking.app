@@ -73,7 +73,7 @@ const MAIN_HomeScreen = () => {
   );
 
   const handleItemPress = (item) => {
-    navigation.navigate('VehicleDetailScreen', { vehicleDetails: item, branchDetails });
+    navigation.navigate('VehicleDetailScreen', { id: item.id, vehicleDetails: item, branchDetails });
   };
 
   return (

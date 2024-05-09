@@ -9,11 +9,25 @@ import { SERVER_URL } from '../services/GlobalAPI';
 
 const VehicleDetailScreen = () => {
   const route = useRoute();
-  const { vehicleDetails, fromHistory, branchDetails } = route.params;
+  const { id, vehicleDetails, fromHistory, branchDetails } = route.params;
+
+  const [vehicleInfo, setVehicleInfo] = useState(null);
   const [ticketInfo, setTicketInfo] = useState(null);
   const navigation = useNavigation();
   const [blacklistReason, setBlacklistReason] = useState('');
   const [showBlacklistInput, setShowBlacklistInput] = useState(false);
+
+
+  const fetchVehicles = async () => {
+    try {
+      const response = await API.requestGET_SP(`/api/v1/eventvehicles/${id}`);
+      if (response && response.data) {
+        setVehicleInfo(response.data);
+      }
+    } catch (error) {
+      console.error('Lỗi khi lấy thông tin xe', error);
+    }
+  };
 
   const fetchTicketInfo = async () => {
     try {
@@ -25,9 +39,10 @@ const VehicleDetailScreen = () => {
   };
 
   useEffect(() => {
+    fetchVehicles();
     fetchTicketInfo(); 
   }, []);
-
+  
   const handleBlackListPress = () => {
     setShowBlacklistInput(true);
   };
@@ -85,34 +100,41 @@ const VehicleDetailScreen = () => {
         // navigationRight="TDTextInputNew"
         isHome  
       />  
-        <View style={styles.imageContainer}>
-            {vehicleDetails.plateImage
-            ? <Image source={{ uri: SERVER_URL + `/` + vehicleDetails.plateImage }} style={styles.image} />
-            : <Text>Không có ảnh</Text>
-            }
-        </View>
-        <Text style={styles.plateNumber}>{vehicleDetails.plateNumber}</Text>
-        <Text style={styles.info}>Thời gian vào: {moment(vehicleDetails.dateTimeEvent).format('DD/MM/YYYY HH:mm')}</Text>
-        {ticketInfo && (
-            <Text style={styles.info}>Mã thẻ xe: {ticketInfo.cardNumber}</Text>
-        )}
-        <Text style={styles.info}>Mô tả: {vehicleDetails.description}</Text>
-
-        {fromHistory !== true && (
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={[styles.button, styles.blackListButton]} onPress={handleBlackListPress}>
-              <Text style={styles.blackListButtonText}>Thêm vào danh sách đen</Text>
-            </TouchableOpacity>
-            <View style={styles.buttonSpacer} />
-            <TouchableOpacity style={[styles.button, styles.exitButton]} onPress={handleExitPress}>
-              <Text style={styles.exitButtonText}>Xe ra</Text>
-            </TouchableOpacity>
+      {vehicleInfo ? (
+        <>
+          <View style={styles.imageContainer}>
+              {vehicleInfo.plateImage
+              ? <Image source={{ uri: SERVER_URL + `/` + vehicleInfo.plateImage }} style={styles.image} />
+              : <Text>Không có ảnh</Text>
+              }
           </View>
-        )}
+          <Text style={styles.plateNumber}>{vehicleInfo.plateNumber}</Text>
+          <Text style={styles.info}>Thời gian vào: {moment(vehicleInfo.dateTimeEvent).format('DD/MM/YYYY HH:mm')}</Text>
+          {ticketInfo && (
+              <Text style={styles.info}>Mã thẻ xe: {ticketInfo.cardNumber}</Text>
+          )}
+          <Text style={styles.info}>Mô tả: {vehicleInfo.description}</Text>
+
+          {fromHistory !== true && (
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={[styles.button, styles.blackListButton]} onPress={handleBlackListPress}>
+                <Text style={styles.blackListButtonText}>Thêm vào danh sách đen</Text>
+              </TouchableOpacity>
+              <View style={styles.buttonSpacer} />
+              <TouchableOpacity style={[styles.button, styles.exitButton]} onPress={handleExitPress}>
+                <Text style={styles.exitButtonText}>Xe ra</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </>
+      ) : (
+        <Text style={styles.info}>Không có thông tin</Text>
+      )}
 
       <Modal animationType="slide" transparent={true} visible={showBlacklistInput}>
         <View style={styles.modalView}>
           <View style={styles.formContainer}>
+            <Text style={styles.info}>Lý do thêm vào danh sách đen:</Text>
             <TextInput
               style={styles.blacklistInput}
               placeholder="Lý do thêm vào danh sách đen..."
