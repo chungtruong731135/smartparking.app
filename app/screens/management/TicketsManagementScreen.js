@@ -53,11 +53,6 @@ const TicketManagementScreen = () => {
     </TouchableOpacity>
   );
   
-  const handleItemPress = (item) => {
-    // Logic when a ticket is pressed
-    console.log('Ticket pressed:', item);
-  };
-
   const handleEditPress = (item) => {
     navigation.navigate('TicketDetailsScreen', { ticketId: item.id, branchDetails });
   };
@@ -87,6 +82,12 @@ const TicketManagementScreen = () => {
         )}
         keyExtractor={(item) => item.id.toString()}
       />
+      <TouchableOpacity 
+        style={styles.floatingButton} 
+        onPress={() => navigation.navigate('AddTicketScreen', {branchDetails})}
+        >
+        <Icon name="plus" size={24} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -143,6 +144,22 @@ const styles = StyleSheet.create({
   icon: {
     marginHorizontal: 5,
   },
+  floatingButton: {
+    position: 'absolute',
+    right: 30,
+    bottom: 30,
+    backgroundColor: Colors.primary,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  }
 });
 
 export default TicketManagementScreen;

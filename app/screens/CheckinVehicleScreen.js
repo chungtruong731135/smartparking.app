@@ -208,7 +208,7 @@ const CheckinVehicleScreen = ({ route }) => {
               }
           }
       } catch (error) {
-          console.error('Failed to read NFC tag:', error);
+          // console.error('Failed to read NFC tag:', error);
           alert('Không thể đọc thẻ NFC!');
       } finally {
           NfcManager.cancelTechnologyRequest();

@@ -14,6 +14,7 @@ import CheckinVehicleScreen from '../screens/CheckinVehicleScreen';
 import { UserProfileScreen, MainManagementScreen, TicketsManagementScreen } from '../screens/management';
 import TicketDetailsScreen from '../screens/management/ticket/TicketDetailsScreen';
 import RevenueStatisticsScreen from '../screens/RevenueStatisticsScreen';
+import AddTicketScreen from '../screens/management/ticket/AddTicketScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ const App_ = () => {
                 <Stack.Screen name="UserProfileScreen" component={UserProfileScreen} />
                 <Stack.Screen name="TicketsManagementScreen" component={TicketsManagementScreen} />
                 <Stack.Screen name="TicketDetailsScreen" component={TicketDetailsScreen} />
+                <Stack.Screen name="AddTicketScreen" component={AddTicketScreen} />
             <Stack.Screen name="RevenueStatisticsScreen" component={RevenueStatisticsScreen} />
 
         </Stack.Navigator>

@@ -33,7 +33,7 @@ const TicketDetailsScreen = () => {
   useEffect(() => {
     NfcManager.start();
     return () => {
-    //   NfcManager.stop();
+      // NfcManager.stop();
     };
   }, []);
 
@@ -95,7 +95,7 @@ const TicketDetailsScreen = () => {
             setModalVisible(false);
             alert('Ghi thông tin lên thẻ NFC thành công!');
         } catch (error) {
-            console.error('Failed to write NFC tag:', error);
+            // console.error('Failed to write NFC tag:', error);
             setModalVisible(false);
             alert('Ghi thông tin lên thẻ NFC thất bại!');
             console.log(error);
