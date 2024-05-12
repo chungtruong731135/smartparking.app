@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, FlatList, Image, TextInput } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, FlatList, Image, TextInput, Modal, ActivityIndicator } from 'react-native';
 import { TD_Header, TDTextInputNew, FooterMenu } from '../../components';
 import { Colors } from '../../theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -8,6 +8,8 @@ import API, { SERVER_URL } from '../../services/GlobalAPI';
 import moment from 'moment';
 import { TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import NfcManager, {NfcTech, Ndef} from 'react-native-nfc-manager';
 
 const MAIN_HomeScreen = () => {
   const route = useRoute();
@@ -15,6 +17,9 @@ const MAIN_HomeScreen = () => {
   const { branchDetails } = route.params;
   const [vehicleList, setVehicleList] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
+
+  const [selectedTicket, setSelectedTicket] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fetchVehicles = async () => {
     try {
@@ -76,6 +81,35 @@ const MAIN_HomeScreen = () => {
     navigation.navigate('VehicleDetailScreen', { id: item.id, vehicleDetails: item, branchDetails });
   };
 
+  const readNfc = async () => {
+    setModalVisible(true);
+    try {
+        await NfcManager.requestTechnology(NfcTech.Ndef);
+        const tag = await NfcManager.getTag();
+
+        if (tag.ndefMessage) {
+            let ndefRecords = tag.ndefMessage;
+
+            for (const record of ndefRecords) {
+                const textDecoder = new TextDecoder('utf-8');
+                const text = textDecoder.decode(new Uint8Array(record.payload));
+
+                if (text.includes('Id:')) {
+                    const ticketIdFromTag = text.match(/Id:\s*(.+)\n/)[1];
+
+                    setSelectedTicket(ticketIdFromTag);
+                    navigation.navigate('VehicleDetailsByTicketScreen', { ticketId: ticketIdFromTag, branchDetails, fromHistory: false  });
+                }
+            }
+        }
+    } catch (error) {
+        alert('Đã thoát!');
+    } finally {
+        NfcManager.cancelTechnologyRequest();
+        setModalVisible(false);
+    }
+};
+
   return (
     <View style={styles.container}>
       <TD_Header
@@ -94,6 +128,7 @@ const MAIN_HomeScreen = () => {
           style={styles.searchInput}
           placeholder="Nhập PlateNumber..."
           onChangeText={(text) => searchVehicles(text)}
+          placeholderTextColor="#000"
         />
       )}
       <Text style={styles.header}>{branchDetails.name}</Text>
@@ -107,7 +142,38 @@ const MAIN_HomeScreen = () => {
         )}
         keyExtractor={(item) => item.id}
       />
+      <TouchableOpacity 
+        style={styles.floatingButton} 
+        onPress={readNfc}
+        >
+        <Icon name="ticket" size={24} color="#fff" />
+      </TouchableOpacity>
       <FooterMenu navigation={navigation} branchDetails={branchDetails} />
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+            setModalVisible(!modalVisible);
+        }}
+        >
+        <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={styles.modalText}>Vui lòng đưa thẻ đến gần thiết bị Android của bạn.</Text>
+            <TouchableOpacity
+                style={styles.cancelButtonModal}
+                onPress={() => {
+                setModalVisible(false);
+                NfcManager.cancelTechnologyRequest(); // Ngưng yêu cầu NFC nếu người dùng hủy
+                }}
+            >
+                <Text style={styles.cancelButtonText}>Hủy</Text>
+            </TouchableOpacity>
+            </View>
+        </View>
+        </Modal>
     </View>
   );
 };
@@ -170,6 +236,61 @@ const styles = StyleSheet.create({
     padding: 10,
     color: '#000',
   },
+  floatingButton: {
+    position: 'absolute',
+    right: 30,
+    bottom: 100,
+    backgroundColor: Colors.primary,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+        width: 0,
+        height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+    },
+    modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#000'
+  },
+  cancelButtonModal: {
+    backgroundColor: 'red', // Màu nền cho nút hủy
+    borderRadius: 20, // Bo tròn góc
+    padding: 10, // Đệm xung quanh nội dung trong nút
+    elevation: 2, // Độ nổi của nút, tạo hiệu ứng bóng
+    marginTop: 10, // Khoảng cách từ nội dung trên
+  },
+  cancelButtonText: {
+    color: 'white', // Màu chữ
+    fontWeight: 'bold', // Độ đậm của chữ
+    textAlign: 'center', // Căn giữa chữ trong nút
+  }
 });
 
 

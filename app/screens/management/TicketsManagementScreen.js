@@ -37,7 +37,7 @@ const TicketManagementScreen = () => {
   );
 
   const Item = ({ name, cardNumber, isActive, onEdit, onDelete }) => (
-    <TouchableOpacity style={styles.item}>
+    <TouchableOpacity style={styles.item} onPress={onEdit}>
       <View style={styles.infoContainer}>
         <Text style={styles.name}>Tên thẻ: {name}</Text>
         <Text style={styles.cardNumber}>Mã thẻ: {cardNumber}</Text>
@@ -77,14 +77,13 @@ const TicketManagementScreen = () => {
             <Item
             {...item}
             onEdit={() => handleEditPress(item)}
-            onDelete={() => handleDeletePress(item)}
             />
-        )}
+        )}  
         keyExtractor={(item) => item.id.toString()}
       />
       <TouchableOpacity 
         style={styles.floatingButton} 
-        onPress={() => navigation.navigate('AddTicketScreen', {branchDetails})}
+        onPress={() => navigation.navigate('AddTicketScreen', { branchDetails })}
         >
         <Icon name="plus" size={24} color="#fff" />
       </TouchableOpacity>

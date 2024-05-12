@@ -74,7 +74,7 @@ const HistoryEventVehicleScreen = () => {
   );
 
   const handleItemPress = (item) => {
-    navigation.navigate('VehicleDetailScreen', { vehicleDetails: item, fromHistory: true });
+    navigation.navigate('VehicleDetailScreen', { id: item.id, vehicleDetails: item, fromHistory: true });
   };
 
   return (
@@ -95,6 +95,8 @@ const HistoryEventVehicleScreen = () => {
           style={styles.searchInput}
           placeholder="Nhập PlateNumber..."
           onChangeText={(text) => searchVehicles(text)}
+          placeholderTextColor="#000"
+          color="#000"
         />
       )}
       <Text style={styles.header}>{branchDetails.name}</Text>
@@ -129,6 +131,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     padding: 10,
     textAlign: 'center',
+    color: '#000'
   },
   item: {
     flexDirection: 'row',

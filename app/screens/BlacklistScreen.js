@@ -129,7 +129,7 @@ const BlacklistScreen = ({ route }) => {
         backgroundColor={Colors.primary}
         textColor={'#fff'}
         leftComponent
-        checkrightComponent={true}
+        // checkrightComponent={true}
         // setShowSearch={setShowSearch}
         isHome  
       />

@@ -9,7 +9,7 @@ import { SERVER_URL } from '../services/GlobalAPI';
 
 const VehicleDetailScreen = () => {
   const route = useRoute();
-  const { id, vehicleDetails, fromHistory, branchDetails } = route.params;
+  const { ticketId, branchDetails, fromHistory } = route.params;
 
   const [vehicleInfo, setVehicleInfo] = useState(null);
   const [ticketInfo, setTicketInfo] = useState(null);
@@ -17,14 +17,17 @@ const VehicleDetailScreen = () => {
   const [blacklistReason, setBlacklistReason] = useState('');
   const [showBlacklistInput, setShowBlacklistInput] = useState(false);
 
-  console.log(vehicleDetails)
-
   const fetchVehicles = async () => {
     try {
-      const response = await API.requestGET_SP(`/api/v1/eventvehicles/${id}`);
+        const response = await API.requestPOST_SP('/api/v1/eventvehicles/search-event-vehicles', {
+            pageNumber: 1,
+            pageSize: 1,
+            branchId: branchDetails.id,
+            laneDirection: 'IN',
+            ticketId: ticketId
+          });
       if (response && response.data) {
-        setVehicleInfo(response.data);
-        console.log(vehicleInfo)
+        setVehicleInfo(response.data[0]);
       }
     } catch (error) {
       console.error('Lỗi khi lấy thông tin xe', error);
@@ -33,7 +36,7 @@ const VehicleDetailScreen = () => {
 
   const fetchTicketInfo = async () => {
     try {
-      const response = await API.requestGET_SP(`/api/v1/tickets/${vehicleDetails.ticketId}`);
+      const response = await API.requestGET_SP(`/api/v1/tickets/${ticketId}`);
       setTicketInfo(response.data);
     } catch (error) {
       console.error('Lỗi khi lấy thông tin vé', error);

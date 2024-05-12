@@ -30,6 +30,7 @@ const CheckinVehicleScreen = ({ route }) => {
     const [plateImageData, setPlateImageData] = useState('');
 
     const [modalVisible, setModalVisible] = useState(false);
+    const [blacklistModalVisible, setBlacklistModalVisible] = useState(false);
 
     useEffect(() => {
       const timer = setInterval(() => {
@@ -134,6 +135,24 @@ const CheckinVehicleScreen = ({ route }) => {
       });
     };
 
+    const checkBlacklistStatus = async () => {
+      try {
+        const response = await API.requestPOST_SP('/api/v1/vehicleblacklists/search', {
+          branchId: branchDetails.id,
+          plateNumber: vehicleNumber,
+        });
+        
+        if (response && response.data && response.data.length > 0) {
+          setBlacklistModalVisible(true);
+        } else {
+          enterVehicle();
+        }
+      } catch (error) {
+        console.error('Error checking blacklist status:', error);
+        alert('Không thể kiểm tra danh sách đen. Vui lòng thử lại sau.');
+      }
+    };
+
     const enterVehicle = async () => {
       try {
         if (imageSource) {
@@ -167,19 +186,20 @@ const CheckinVehicleScreen = ({ route }) => {
             ticketId,
           });
     
-          if (response) {
+          if (response && response.data) {
             console.log('Request thành công:', response.data);
             alert('Xe vào thành công!');
             navigation.goBack();
           } else {
-            console.error('Request không thành công:', response);
+            // console.error('Request không thành công:', response);
+            alert('Xe vào không thành công! Hãy kiểm tra lại.');
           }
     
         } else {
-          console.error('Không có ảnh được chọn.');
+          alert('Không có ảnh được chọn.');
         }
       } catch (error) {
-        console.error('Error entering vehicle:', error);
+        alert('Error entering vehicle');
       }
     };
 
@@ -188,28 +208,44 @@ const CheckinVehicleScreen = ({ route }) => {
       try {
           await NfcManager.requestTechnology(NfcTech.Ndef);
           const tag = await NfcManager.getTag();
-          console.log('NFC Tag Detected:', tag);
+          // console.log('NFC Tag Detected:', tag);
   
           if (tag.ndefMessage) {
               let ndefRecords = tag.ndefMessage;
-              console.log(ndefRecords);
+              // console.log(ndefRecords);
   
               for (const record of ndefRecords) {
                   const textDecoder = new TextDecoder('utf-8');
                   const text = textDecoder.decode(new Uint8Array(record.payload));
   
                   console.log(text ? text : null);
-  
-                  if (text.includes('Id:')) {
-                      const ticketIdFromTag = text.match(/Id:\s*(.+)\n/)[1];
-                      alert('Ticket ID from NFC Tag:', ticketIdFromTag);
+
+                  const idRegex = /Id:\s*([^\n]+)/;
+                  const idMatch = text.match(idRegex);
+                  const ticketIdFromTag = idMatch && idMatch[1] ? idMatch[1].trim() : null;
+
+                  // Bắt giá trị Name
+                  const nameRegex = /Name:\s*([^\n]+)/;
+                  const nameMatch = text.match(nameRegex);
+                  const nameFromTag = nameMatch && nameMatch[1] ? nameMatch[1].trim() : null;
+
+                  if (ticketIdFromTag && nameFromTag) {
+                      alert(`Ticket ID from NFC Tag: ${ticketIdFromTag}\nName: ${nameFromTag}`);
                       setSelectedTicket(ticketIdFromTag);
+                  } else {
+                      alert('Lỗi', 'Không tìm thấy Ticket ID hoặc Name trong thẻ NFC');
                   }
+  
+                  // if (text.includes('Id:')) {
+                  //     const ticketIdFromTag = text.match(/Id:\s*(.+)\n/)[1];
+                  //     // alert(`Ticket ID from NFC Tag: ${ticketIdFromTag}`);
+                  //     setSelectedTicket(ticketIdFromTag);
+                  // }
               }
           }
       } catch (error) {
           // console.error('Failed to read NFC tag:', error);
-          alert('Không thể đọc thẻ NFC!');
+          alert('Lỗi', 'Không thể đọc thẻ NFC!');
       } finally {
           NfcManager.cancelTechnologyRequest();
           setModalVisible(false);
@@ -286,7 +322,7 @@ const CheckinVehicleScreen = ({ route }) => {
         <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()} >
             <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.blackListButton} onPress={enterVehicle}>
+        <TouchableOpacity style={styles.blackListButton} onPress={checkBlacklistStatus}>
             <Text style={styles.blackListButtonText}>Xe vào</Text>
         </TouchableOpacity>
       </View>
@@ -314,7 +350,34 @@ const CheckinVehicleScreen = ({ route }) => {
             </TouchableOpacity>
             </View>
         </View>
-        </Modal>
+      </Modal>
+
+      <Modal
+        visible={blacklistModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setBlacklistModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Xe này nằm trong danh sách đen. Có đồng ý cho vào không?</Text>
+            <View style={styles.modalButtonGroup}>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => {
+                setBlacklistModalVisible(false);
+                navigation.goBack();
+              }}>
+                <Text style={styles.cancelButtonText}>Hủy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.blackListButton} onPress={() => {
+                setBlacklistModalVisible(false);
+                enterVehicle();
+              }}>
+                <Text style={styles.blackListButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -440,38 +503,44 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
-  margin: 20,
-  backgroundColor: 'white',
-  borderRadius: 20,
-  padding: 35,
-  alignItems: 'center',
-  shadowColor: '#000',
-  shadowOffset: {
-      width: 0,
-      height: 2
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+        width: 0,
+        height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
   },
-  shadowOpacity: 0.25,
-  shadowRadius: 4,
-  elevation: 5
+    modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#000'
   },
-  modalText: {
-  marginBottom: 15,
-  textAlign: 'center',
-  fontSize: 16,
-  color: '#000'
+    cancelButtonModal: {
+    backgroundColor: 'red',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 10,
   },
-  cancelButtonModal: {
-  backgroundColor: 'red', // Màu nền cho nút hủy
-  borderRadius: 20, // Bo tròn góc
-  padding: 10, // Đệm xung quanh nội dung trong nút
-  elevation: 2, // Độ nổi của nút, tạo hiệu ứng bóng
-  marginTop: 10, // Khoảng cách từ nội dung trên
+    cancelButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
-  cancelButtonText: {
-  color: 'white', // Màu chữ
-  fontWeight: 'bold', // Độ đậm của chữ
-  textAlign: 'center', // Căn giữa chữ trong nút
-  }
+  modalButtonGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 20,
+  },
 });
 
 export default CheckinVehicleScreen;

@@ -7,14 +7,19 @@ import { useNavigation } from '@react-navigation/native';
 import { MAIN_HomeScreen } from '../screens/main';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { BranchUserScreen } from '../screens/chooseBranch';
-import VehicleDetailScreen from '../screens/VehicleDetailScreen'
-import HistoryEventVehicleScreen from '../screens/HistoryEventVehicleScreen'
+import VehicleDetailScreen from '../screens/VehicleDetailScreen';
+import VehicleDetailsByTicketScreen from '../screens/VehicleDetailsByTicketScreen';
+import HistoryEventVehicleScreen from '../screens/HistoryEventVehicleScreen';
 import BlacklistScreen from '../screens/BlacklistScreen';
 import CheckinVehicleScreen from '../screens/CheckinVehicleScreen';
 import { UserProfileScreen, MainManagementScreen, TicketsManagementScreen } from '../screens/management';
 import TicketDetailsScreen from '../screens/management/ticket/TicketDetailsScreen';
 import RevenueStatisticsScreen from '../screens/RevenueStatisticsScreen';
 import AddTicketScreen from '../screens/management/ticket/AddTicketScreen';
+import UserDetailsScreen from '../screens/management/user/UserDetailScreen';
+import ChangePassWordScreen from '../screens/management/user/ChangePasswordScreen';
+
+import { LoginScreen } from '../screens/auth';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +36,7 @@ const App_ = () => {
             <Stack.Screen name="BranchUserScreen" component={BranchUserScreen} />
             <Stack.Screen name="MAIN_HomeScreen" component={MAIN_HomeScreen} />
             <Stack.Screen name="VehicleDetailScreen" component={VehicleDetailScreen} />
+            <Stack.Screen name="VehicleDetailsByTicketScreen" component={VehicleDetailsByTicketScreen} />
             <Stack.Screen name="HistoryEventVehicleScreen" component={HistoryEventVehicleScreen} />
             <Stack.Screen name="BlacklistScreen" component={BlacklistScreen} />
             <Stack.Screen name="CheckinVehicleScreen" component={CheckinVehicleScreen} />
@@ -39,7 +45,10 @@ const App_ = () => {
                 <Stack.Screen name="TicketsManagementScreen" component={TicketsManagementScreen} />
                 <Stack.Screen name="TicketDetailsScreen" component={TicketDetailsScreen} />
                 <Stack.Screen name="AddTicketScreen" component={AddTicketScreen} />
+                <Stack.Screen name="UserDetailsScreen" component={UserDetailsScreen} />
+                <Stack.Screen name="ChangePassWordScreen" component={ChangePassWordScreen} />
             <Stack.Screen name="RevenueStatisticsScreen" component={RevenueStatisticsScreen} />
+            <Stack.Screen name="LoginScreen" component={LoginScreen} />
 
         </Stack.Navigator>
     );
